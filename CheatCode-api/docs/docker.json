@@ -1,0 +1,103 @@
+{
+  "title": "Docker",
+  "icon": "🐳",
+  "order": 1,
+  "summary": "Install Docker and learn every everyday command with its flags.",
+  "sections": [
+    {
+      "id": "install", "title": "Install", "lead": "Pick your system. After installing, run the check command.",
+      "blocks": [
+        {"type": "tabs", "tabs": [
+          {"label": "Windows", "note": "Needs Windows 10/11 with WSL 2. Docker Desktop sets it up for you.", "commands": ["winget install -e --id Docker.DockerDesktop", "wsl --install"], "more": "Restart, open Docker Desktop, and wait for the whale icon to turn steady."},
+          {"label": "macOS", "note": "Works on Intel and Apple Silicon.", "commands": ["brew install --cask docker"], "more": "Or download Docker Desktop from docker.com and open it once to finish setup."},
+          {"label": "Ubuntu / Debian", "note": "Official apt repository method.", "commands": ["sudo apt update && sudo apt install -y ca-certificates curl", "sudo install -m 0755 -d /etc/apt/keyrings", "sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc", "echo \"deb [signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo $VERSION_CODENAME) stable\" | sudo tee /etc/apt/sources.list.d/docker.list", "sudo apt update && sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin"], "more": "On Debian, replace 'ubuntu' with 'debian' in both URLs."},
+          {"label": "Any Linux", "note": "Convenience script. Fine for learning, not for production servers.", "commands": ["curl -fsSL https://get.docker.com | sh"]}
+        ]},
+        {"type": "text", "text": "After installing"},
+        {"type": "code", "title": "Run docker without sudo (Linux)", "code": "sudo usermod -aG docker $USER && newgrp docker"},
+        {"type": "code", "title": "Start on boot (Linux)", "code": "sudo systemctl enable --now docker"},
+        {"type": "code", "title": "Check it works", "code": "docker run hello-world"},
+        {"type": "code", "title": "Check versions", "code": "docker --version && docker compose version"}
+      ]
+    },
+    {
+      "id": "basics", "title": "Basics", "lead": "Four words cover most of Docker.",
+      "blocks": [
+        {"type": "facts", "items": [
+          ["Image", "A read-only template: your app plus everything it needs. Like a recipe."],
+          ["Container", "A running copy of an image. Like a dish made from the recipe."],
+          ["Volume", "A folder outside the container so data survives when it is deleted."],
+          ["Registry", "A place to store and download images. Docker Hub is the default."]
+        ]},
+        {"type": "tip", "text": "Flow: write a Dockerfile, build an image, run a container, push the image to a registry."}
+      ]
+    },
+    {
+      "id": "containers", "title": "Containers", "lead": "Create, run, inspect and stop containers.",
+      "blocks": [
+        {"type": "command", "name": "docker run", "what": "Create and start a container from an image.", "syntax": "docker run [OPTIONS] IMAGE [COMMAND]", "options": [["-d", "Run in background (detached)"], ["-p 8080:80", "Map host port 8080 to container port 80"], ["--name web", "Give the container a name"], ["-e KEY=value", "Set an environment variable"], ["-v host:container", "Mount a volume or folder"], ["--rm", "Delete the container when it stops"], ["-it", "Interactive terminal, used for shells"], ["--network net", "Attach to a network"]], "example": "docker run -d --name web -p 8080:80 nginx"},
+        {"type": "command", "name": "docker ps", "what": "List containers.", "syntax": "docker ps [OPTIONS]", "options": [["-a", "Show stopped containers too"], ["-q", "Print only IDs"], ["--filter status=exited", "Filter the list"]], "example": "docker ps -a"},
+        {"type": "command", "name": "docker stop / start / restart", "what": "Stop, start or restart a container by name or ID.", "syntax": "docker stop CONTAINER", "options": [["-t 5", "Seconds to wait before force kill (stop)"]], "example": "docker stop web && docker start web"},
+        {"type": "command", "name": "docker rm", "what": "Delete a container.", "syntax": "docker rm [OPTIONS] CONTAINER", "options": [["-f", "Force remove a running container"], ["-v", "Also remove its anonymous volumes"]], "example": "docker rm -f web"},
+        {"type": "command", "name": "docker logs", "what": "Show the output of a container.", "syntax": "docker logs [OPTIONS] CONTAINER", "options": [["-f", "Follow live output"], ["--tail 50", "Only the last 50 lines"], ["-t", "Add timestamps"]], "example": "docker logs -f --tail 50 web"},
+        {"type": "command", "name": "docker exec", "what": "Run a command inside a running container.", "syntax": "docker exec [OPTIONS] CONTAINER COMMAND", "options": [["-it", "Interactive terminal"], ["-u root", "Run as a specific user"], ["-w /app", "Set the working directory"]], "example": "docker exec -it web sh"},
+        {"type": "command", "name": "docker inspect", "what": "Show full details (IP, mounts, config) as JSON.", "syntax": "docker inspect [OPTIONS] NAME|ID", "options": [["-f '{{.State.Status}}'", "Pick one field with a Go template"]], "example": "docker inspect web"},
+        {"type": "command", "name": "docker cp", "what": "Copy files between host and container.", "syntax": "docker cp SRC DEST", "options": [["container:/path", "Use this form for the container side"]], "example": "docker cp web:/etc/nginx/nginx.conf ./nginx.conf"},
+        {"type": "command", "name": "docker stats", "what": "Live CPU and memory use.", "syntax": "docker stats [CONTAINER]", "options": [["--no-stream", "Print once and exit"]], "example": "docker stats --no-stream"}
+      ]
+    },
+    {
+      "id": "images", "title": "Images", "lead": "Download, build, tag and clean up images.",
+      "blocks": [
+        {"type": "command", "name": "docker build", "what": "Build an image from a Dockerfile.", "syntax": "docker build [OPTIONS] PATH", "options": [["-t name:tag", "Name and tag the image"], ["-f file", "Use a different Dockerfile"], ["--no-cache", "Rebuild every step"], ["--build-arg K=V", "Pass a build variable"]], "example": "docker build -t myapp:1.0 ."},
+        {"type": "command", "name": "docker images", "what": "List local images.", "syntax": "docker images [OPTIONS]", "options": [["-a", "Include intermediate layers"], ["-q", "IDs only"]], "example": "docker images"},
+        {"type": "command", "name": "docker pull", "what": "Download an image from a registry.", "syntax": "docker pull IMAGE[:TAG]", "options": [["--platform linux/amd64", "Choose the CPU architecture"]], "example": "docker pull node:20-alpine"},
+        {"type": "command", "name": "docker push", "what": "Upload an image to a registry. Run docker login first.", "syntax": "docker push NAME[:TAG]", "example": "docker push myuser/myapp:1.0"},
+        {"type": "command", "name": "docker tag", "what": "Add another name to an image.", "syntax": "docker tag SOURCE TARGET", "example": "docker tag myapp:1.0 myuser/myapp:1.0"},
+        {"type": "command", "name": "docker rmi", "what": "Delete an image.", "syntax": "docker rmi [OPTIONS] IMAGE", "options": [["-f", "Force removal"]], "example": "docker rmi nginx"},
+        {"type": "command", "name": "docker history", "what": "Show the layers of an image.", "syntax": "docker history IMAGE", "options": [["--no-trunc", "Show full commands"]], "example": "docker history nginx"}
+      ]
+    },
+    {
+      "id": "volumes-networks", "title": "Volumes & Networks", "lead": "Keep data safe and let containers talk to each other.",
+      "blocks": [
+        {"type": "command", "name": "docker volume create", "what": "Make a named volume.", "syntax": "docker volume create NAME", "example": "docker volume create dbdata"},
+        {"type": "command", "name": "docker volume ls / rm / inspect", "what": "List, delete or inspect volumes.", "syntax": "docker volume ls", "options": [["-f dangling=true", "Only unused volumes"]], "example": "docker volume rm dbdata"},
+        {"type": "command", "name": "docker network create", "what": "Make a network. Containers on the same custom network reach each other by name.", "syntax": "docker network create [OPTIONS] NAME", "options": [["--driver bridge", "Network type (default)"]], "example": "docker network create appnet"},
+        {"type": "command", "name": "docker network ls / connect / rm", "what": "List networks, attach a container, or delete a network.", "syntax": "docker network connect NETWORK CONTAINER", "example": "docker network connect appnet web"}
+      ]
+    },
+    {
+      "id": "compose", "title": "Compose", "lead": "Run several containers from one docker-compose.yml file.",
+      "blocks": [
+        {"type": "command", "name": "docker compose up", "what": "Create and start everything in the file.", "syntax": "docker compose up [OPTIONS]", "options": [["-d", "Run in background"], ["--build", "Rebuild images first"], ["-f file.yml", "Use another compose file"]], "example": "docker compose up -d --build"},
+        {"type": "command", "name": "docker compose down", "what": "Stop and remove containers and networks.", "syntax": "docker compose down [OPTIONS]", "options": [["-v", "Also delete volumes (your data!)"], ["--rmi all", "Also delete images"]], "example": "docker compose down"},
+        {"type": "command", "name": "docker compose ps / logs", "what": "See service status or output.", "syntax": "docker compose logs [SERVICE]", "options": [["-f", "Follow output"]], "example": "docker compose logs -f web"},
+        {"type": "command", "name": "docker compose exec", "what": "Run a command inside a service.", "syntax": "docker compose exec SERVICE COMMAND", "example": "docker compose exec db psql -U postgres"},
+        {"type": "code", "title": "Full docker-compose.yml example", "code": "services:\n  web:\n    build: .\n    ports:\n      - \"8080:80\"\n    environment:\n      - DB_HOST=db\n    depends_on: [db]\n  db:\n    image: postgres:16\n    environment:\n      POSTGRES_PASSWORD: example\n    volumes:\n      - dbdata:/var/lib/postgresql/data\nvolumes:\n  dbdata:"}
+      ]
+    },
+    {
+      "id": "dockerfile", "title": "Dockerfile", "lead": "The instructions that describe how to build your image.",
+      "blocks": [
+        {"type": "command", "name": "FROM", "what": "Base image to start from. Always the first line.", "syntax": "FROM node:20-alpine"},
+        {"type": "command", "name": "WORKDIR", "what": "Folder where the next commands run.", "syntax": "WORKDIR /app"},
+        {"type": "command", "name": "COPY", "what": "Copy files from your project into the image.", "syntax": "COPY package*.json ./"},
+        {"type": "command", "name": "RUN", "what": "Run a command while building, like installing packages.", "syntax": "RUN npm install"},
+        {"type": "command", "name": "ENV", "what": "Set an environment variable.", "syntax": "ENV PORT=3000"},
+        {"type": "command", "name": "EXPOSE", "what": "Document which port the app uses.", "syntax": "EXPOSE 3000"},
+        {"type": "command", "name": "CMD / ENTRYPOINT", "what": "Command that runs when the container starts. CMD can be overridden, ENTRYPOINT is fixed.", "syntax": "CMD [\"node\", \"server.js\"]"},
+        {"type": "code", "title": "Full Dockerfile example", "code": "FROM node:20-alpine\nWORKDIR /app\nCOPY package*.json ./\nRUN npm install\nCOPY . .\nEXPOSE 3000\nCMD [\"node\", \"server.js\"]"}
+      ]
+    },
+    {
+      "id": "cleanup", "title": "Clean up & Registry", "lead": "Free disk space and log in to registries.",
+      "blocks": [
+        {"type": "command", "name": "docker system df", "what": "See how much space Docker uses.", "syntax": "docker system df"},
+        {"type": "command", "name": "docker system prune", "what": "Remove stopped containers, unused networks and dangling images.", "syntax": "docker system prune [OPTIONS]", "options": [["-a", "Also remove all unused images"], ["--volumes", "Also remove unused volumes"], ["-f", "Skip the confirmation"]], "example": "docker system prune -a"},
+        {"type": "command", "name": "docker login / logout", "what": "Sign in to Docker Hub or another registry.", "syntax": "docker login [SERVER]", "options": [["-u user", "Username"]], "example": "docker login"},
+        {"type": "command", "name": "docker search", "what": "Search Docker Hub.", "syntax": "docker search TERM", "options": [["--limit 5", "Limit results"]], "example": "docker search redis"}
+      ]
+    }
+  ]
+}

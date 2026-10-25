@@ -1,0 +1,6 @@
+.git
+.env
+.env.*
+!.env.local.example
+npm-debug.log*
+node_modules

@@ -1,0 +1,32 @@
+{
+  "title": "Git",
+  "icon": "🌿",
+  "order": 2,
+  "summary": "A starter topic that shows how easy it is to add a new one.",
+  "sections": [
+    {
+      "id": "start", "title": "Getting started", "lead": "Set your name once, then create or copy a repository.",
+      "blocks": [
+        {"type": "command", "name": "git init", "what": "Turn the current folder into a repository.", "syntax": "git init", "example": "git init"},
+        {"type": "command", "name": "git clone", "what": "Copy a remote repository to your machine.", "syntax": "git clone URL [FOLDER]", "options": [["--depth 1", "Download only the latest snapshot"], ["-b name", "Check out a specific branch"]], "example": "git clone https://github.com/user/repo.git"}
+      ]
+    },
+    {
+      "id": "daily", "title": "Daily work", "lead": "The loop you repeat all day.",
+      "blocks": [
+        {"type": "command", "name": "git status", "what": "See what changed.", "syntax": "git status", "options": [["-s", "Short output"]]},
+        {"type": "command", "name": "git add", "what": "Stage changes for the next commit.", "syntax": "git add PATH", "options": [[".", "Stage everything"], ["-p", "Choose changes piece by piece"]], "example": "git add ."},
+        {"type": "command", "name": "git commit", "what": "Save staged changes as a snapshot.", "syntax": "git commit [OPTIONS]", "options": [["-m \"msg\"", "Write the message inline"], ["--amend", "Edit the last commit"]], "example": "git commit -m \"Add login page\""},
+        {"type": "command", "name": "git push / pull", "what": "Send your commits or fetch new ones.", "syntax": "git push [REMOTE] [BRANCH]", "options": [["-u origin main", "Remember the remote for next time"]], "example": "git push -u origin main"}
+      ]
+    },
+    {
+      "id": "branches", "title": "Branches", "lead": "Work on features without touching main.",
+      "blocks": [
+        {"type": "command", "name": "git switch", "what": "Move to a branch.", "syntax": "git switch BRANCH", "options": [["-c name", "Create it first"]], "example": "git switch -c feature/search"},
+        {"type": "command", "name": "git merge", "what": "Bring another branch into the current one.", "syntax": "git merge BRANCH", "options": [["--no-ff", "Always create a merge commit"]], "example": "git merge feature/search"},
+        {"type": "tip", "text": "Made a mistake? git restore FILE throws away your uncommitted edits to that file."}
+      ]
+    }
+  ]
+}

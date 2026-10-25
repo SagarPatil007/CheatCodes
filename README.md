@@ -7,7 +7,7 @@
 Search practical guides, learn what each command does, and copy examples in a
 click. Add your own topics without a database.
 
-[Get started](#run-locally) · [Features](#features) · [Add a guide](#add-a-guide)
+[Get started](#installation) · [Features](#features) · [Add a guide](#add-a-guide)
 
 </div>
 
@@ -39,24 +39,51 @@ Git topics. Use the switch in the top navigation to choose light or dark mode.
   restart.
 - **Responsive layout:** Use the guides on desktop or smaller screens.
 
-## Run locally
+## Installation
 
 ### Requirements
 
 - Java 25+
 - Node.js 20+ and npm
-- Docker Desktop with Docker Compose (for the Docker option)
+- Docker Desktop with Docker Compose (only for the Docker option)
 
-### Start the app with Docker Compose
+### Option 1: Run normally (development)
 
-The Dockerfiles package the API JAR and Next.js standalone build, so build both
-artifacts before starting Compose.
+Run the API and frontend in separate terminals from the repository root.
 
-From the repository root in PowerShell:
+**Terminal 1 — API**
 
 ```powershell
-Copy-Item .env.example .env
+Set-Location .\CheatCode-api
+.\mvnw.cmd spring-boot:run
+```
 
+**Terminal 2 — frontend**
+
+```powershell
+Set-Location .\CheatCode-web
+npm ci
+if (-not (Test-Path .env.local)) { Copy-Item .env.local.example .env.local }
+npm run dev
+```
+
+Open **http://localhost:3000**. The API runs at
+**http://localhost:8080/api/topics**. The web `.env.local.example` points the
+frontend to the local API; `.env.local` is for your machine and should not be
+committed.
+
+### Option 2: Run with Docker Compose
+
+From the repository root in PowerShell, prepare the local environment file:
+
+```powershell
+if (-not (Test-Path .env)) { Copy-Item .env.example .env }
+```
+
+The Dockerfiles use the API JAR and Next.js standalone build, so build both
+artifacts before starting Compose:
+
+```powershell
 .\CheatCode-api\mvnw.cmd -f .\CheatCode-api\pom.xml -DskipTests package
 
 Set-Location .\CheatCode-web
@@ -67,17 +94,11 @@ Set-Location ..
 docker compose up --build
 ```
 
-Visit **http://localhost:3000**. The API is available at
-**http://localhost:8080/api/topics**.
+Open **http://localhost:3000**. Stop the services with `Ctrl+C`, then remove
+the containers with `docker compose down`.
 
-Stop the app with `Ctrl+C`; remove the stopped containers with:
-
-```powershell
-docker compose down
-```
-
-The root `.env` is ignored by Git. Keep private or environment-specific values
-there, and never commit credentials.
+The root `.env` file is ignored by Git. Keep private or environment-specific
+values there and never commit credentials.
 
 | Variable | Purpose | Default |
 | --- | --- | --- |

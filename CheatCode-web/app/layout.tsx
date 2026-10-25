@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Bricolage_Grotesque, JetBrains_Mono, Source_Sans_3 } from "next/font/google";
+import ThemeToggle from "@/components/ThemeToggle";
 import "./globals.css";
 
 const display = Bricolage_Grotesque({ subsets: ["latin"], weight: ["600", "800"], variable: "--f-display" });
@@ -21,6 +22,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <nav>
             <Link href="/">Home</Link>
             <Link href="/docs">Docs</Link>
+            <ThemeToggle />
           </nav>
         </header>
         {children}
